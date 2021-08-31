@@ -29,6 +29,7 @@ extension DisasterModelImpl: YumemiDisasterHandleDelegate {
     
     func handle(disaster: String) {
         self.fetchDisasterHandler?(disaster)
+        self.fetchDisasterHandler = nil
     }
     
 }
