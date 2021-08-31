@@ -74,7 +74,7 @@ class WeatherViewController: UIViewController {
             }
             
             let alertController = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            alertController.addAction(UIAlertAction(title: "OK", style: .default) { [unowned self] _ in
                 self.dismiss(animated: true) {
                     print("Close ViewController by \(alertController)")
                 }
