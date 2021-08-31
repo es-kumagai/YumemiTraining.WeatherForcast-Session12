@@ -26,6 +26,12 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var disasterLabel: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
+    private var isWeatherFetching = false {
+        didSet {
+            self.isWeatherFetching ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+        }
+    }
+    
     private var presentingAlertController: UIAlertController?
     private var releaseNotificationHandler: (()->Void)?
     
@@ -62,10 +68,15 @@ class WeatherViewController: UIViewController {
     }
     
     @IBAction func loadWeather(_ sender: Any?) {
-        self.activityIndicator.startAnimating()
+        guard !isWeatherFetching else {
+            print("Currently Fetching.")
+            return
+        }
+        
+        self.isWeatherFetching = true
         weatherModel.fetchWeather(at: "tokyo", date: Date()) { result in
             DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
+                self.isWeatherFetching = false
                 self.handleWeather(result: result)
             }
         }
