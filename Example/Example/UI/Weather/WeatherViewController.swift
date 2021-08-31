@@ -26,10 +26,11 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var disasterLabel: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
+    private var presentingAlertController: UIAlertController?
     private var releaseNotificationHandler: (()->Void)?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         let notificationCenter = NotificationCenter.default
         let token = notificationCenter.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { [unowned self] notification in
@@ -42,8 +43,17 @@ class WeatherViewController: UIViewController {
         }
     }
     
-    deinit {
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
         releaseNotificationHandler?()
+    }
+    
+    deinit {
+        presentingAlertController.map {
+            $0.dismiss(animated: false)
+        }
+        
         print(#function)
     }
             
@@ -82,13 +92,21 @@ class WeatherViewController: UIViewController {
                 message = "エラーが発生しました。"
             }
             
+            presentingAlertController.map {
+                $0.dismiss(animated: true)
+            }
+            
             let alertController = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default) { [unowned self] _ in
                 self.dismiss(animated: true) {
                     print("Close ViewController by \(alertController)")
                 }
             })
-            self.present(alertController, animated: true, completion: nil)
+            self.present(alertController, animated: true) {
+                self.presentingAlertController = nil
+            }
+
+            presentingAlertController = alertController
         }
     }
 }
