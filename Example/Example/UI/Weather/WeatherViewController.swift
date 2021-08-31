@@ -26,15 +26,24 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var disasterLabel: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
+    private var releaseNotificationHandler: (()->Void)?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { [unowned self] notification in
+        let notificationCenter = NotificationCenter.default
+        let token = notificationCenter.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { [unowned self] notification in
             self.loadWeather(notification.object)
+        }
+        
+        releaseNotificationHandler = {
+            
+            notificationCenter.removeObserver(token)
         }
     }
     
     deinit {
+        releaseNotificationHandler?()
         print(#function)
     }
             
